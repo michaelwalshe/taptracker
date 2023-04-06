@@ -21,7 +21,7 @@ class KeyInfo:
     timestamp: datetime = datetime.now()
     press_ts: float = -1
     release_ts: float = -1
-    # key: str = ""
+    key: str = ""
     hand: str = "U"
     hold_time: float = -1
 
@@ -113,7 +113,7 @@ def track():
         current_keys[name] = KeyInfo(
             timestamp=datetime.now(),
             press_ts=time.perf_counter(),
-            # key=name,
+            key=name,
             hand=KEY_HAND_MAP.get(name, "U"),
         )
 

@@ -10,6 +10,8 @@ CAS_SERVER = "https://xaas-20791154275.engage.sas.com:443/cas-shared-default-htt
 
 # Unique identifier for this PC
 UUID = str(uuid.UUID(int=uuid.getnode()))[-4:]
+if UUID[0].isnumeric():
+    UUID = f"a{UUID[1:]}"
 
 # Package local files - Tokens
 REFRESH_TOKEN_FILE = importlib.resources.files("taptracker").joinpath("data/refresh_token.txt")
