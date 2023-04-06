@@ -6,7 +6,7 @@ from pathlib import Path
 CLIENT_ID = "taptracker"
 CLIENT_SECRET = "goobly"
 BASE_URL = "https://xaas-20791154275.engage.sas.com/"
-CAS_SERVER = "https://xaas-20791154275.engage.sas.com/cas-shared-default-http/"
+CAS_SERVER = "https://xaas-20791154275.engage.sas.com:443/cas-shared-default-http/"
 
 # Unique identifier for this PC
 UUID = str(uuid.UUID(int=uuid.getnode()))[-4:]

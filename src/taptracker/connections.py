@@ -2,6 +2,7 @@ import base64
 import csv
 import json
 import os
+import warnings
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -15,6 +16,8 @@ from .params import (
     KEY_FILE,
     REFRESH_TOKEN_FILE,
 )
+
+warnings.simplefilter("ignore", category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 
 def refresh_access_token():
@@ -72,7 +75,7 @@ def upload_data(caslib: str, table: str, file: str | Path):
     with file.open("rb") as f:
         data = f.read()
 
-    return requests.post(
+    return requests.put(
         urljoin(CAS_SERVER, f"cas/sessions/{get_session_id()}/actions/upload"),
         data=data,
         headers={
