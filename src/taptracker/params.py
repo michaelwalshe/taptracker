@@ -9,7 +9,7 @@ BASE_URL = "https://xaas-20791154275.engage.sas.com/"
 CAS_SERVER = "https://xaas-20791154275.engage.sas.com:443/cas-shared-default-http/"
 
 # Unique identifier for this PC
-UUID = str(uuid.UUID(int=uuid.getnode()))[-4:]
+UUID = str(uuid.UUID(int=uuid.getnode()))[-12:]
 if UUID[0].isnumeric():
     UUID = f"a{UUID[1:]}"
 
