@@ -162,7 +162,10 @@ def report():
 
     connections.refresh_access_token()
 
-    key_stats = processing.process(KEY_FILE)
+    if KEY_FILE.exists():
+        key_stats = processing.process(KEY_FILE)
+    else:
+        raise RuntimeError(f"No key press data found in {KEY_FILE}")
 
     classification, prob = connections.model_score_presses(
         key_stats, "gb_predict_parkinsons"

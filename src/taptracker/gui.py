@@ -42,7 +42,7 @@ def gui():
         # Bring windows to front
         results_window.lift()
         results_window.attributes("-topmost", True)
-        results_window.after_idle(results_window.attributes, "-topmost", False)
+        # results_window.after_idle(results_window.attributes, "-topmost", False)
 
         # Get and show result from model scoring
         result = report()
