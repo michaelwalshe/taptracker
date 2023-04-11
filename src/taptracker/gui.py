@@ -28,6 +28,8 @@ def gui():
 
     def btn_report():
         print("Calculating...")
+        report_button.configure(text="Calculating...")
+
         # Create new window for results
         results_window = customtkinter.CTkToplevel(app)
         results_window.title("Results")
@@ -47,6 +49,7 @@ def gui():
         # Get and show result from model scoring
         result = report()
         textbox.configure(text=result)
+        report_button.configure(text="Report")
 
     track_button = customtkinter.CTkButton(
         master=app, text="Start tracking", command=btn_track
