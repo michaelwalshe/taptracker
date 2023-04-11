@@ -1,8 +1,8 @@
 import argparse
 from typing import Optional
 
-import taptracker
-from taptracker.gui import gui
+from . import track, upload, report
+from .gui import gui
 
 
 def main(argv: Optional[str] = None):
@@ -40,11 +40,11 @@ def main(argv: Optional[str] = None):
     if args.gui:
         gui()
     elif args.track:
-        taptracker.track()
+        track()
     elif args.upload:
-        taptracker.upload()
+        upload()
     elif args.report:
-        taptracker.report()
+        report()
     else:
         parser.print_help()
 
