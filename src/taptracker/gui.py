@@ -32,6 +32,7 @@ def gui():
 
         # Create new window for results
         results_window = customtkinter.CTkToplevel(app)
+        results_window.iconphoto(True, tkinter.PhotoImage(file=LOGO_FILE))
         results_window.title("Results")
         results_window.geometry("300x200")
 

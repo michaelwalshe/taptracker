@@ -24,7 +24,7 @@ KEY_FILE = DATA / "key_presses.csv"
 
 # Theme and image files
 THEME_FILE = DATA / "ctk_theme.json"
-LOGO_FILE = DATA / "MARQUE-MAIN-LOGO.png"
+LOGO_FILE = DATA / "Icon.png"
 
 # Whether the process is currently running
 IS_RUNNING = DATA / ".is_running"
