@@ -1,5 +1,4 @@
 import base64
-import csv
 import json
 import os
 import warnings
@@ -17,7 +16,9 @@ from .params import (
     REFRESH_TOKEN_FILE,
 )
 
-warnings.simplefilter("ignore", category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
+warnings.simplefilter(
+    "ignore", category=requests.packages.urllib3.exceptions.InsecureRequestWarning
+)
 
 
 def refresh_access_token():
@@ -63,7 +64,7 @@ def get_session_id() -> str:
     return os.environ["VIYA_CAS_SESSION_ID"]
 
 
-def upload_data(caslib: str, table: str, file: str | Path):
+def upload_data(caslib: str, table: str, file: str | Path) -> requests.Response:
     file = Path(file)
     json_params_str = json.dumps(
         {
@@ -103,7 +104,7 @@ def cas_table_exists(caslib: str, table: str) -> bool:
     return int(result.json()["results"]["exists"])
 
 
-def append_cas_table(caslib: str, base: str, data: str):
+def append_cas_table(caslib: str, base: str, data: str) -> requests.Response:
     result = requests.post(
         urljoin(
             CAS_SERVER, f"cas/sessions/{get_session_id()}/actions/dataStep.runCode"
@@ -119,11 +120,9 @@ def append_cas_table(caslib: str, base: str, data: str):
     return result
 
 
-def delete_cas_table(caslib: str, table: str):
+def delete_cas_table(caslib: str, table: str) -> requests.Response:
     result = requests.post(
-        urljoin(
-            CAS_SERVER, f"cas/sessions/{get_session_id()}/actions/table.dropTable"
-        ),
+        urljoin(CAS_SERVER, f"cas/sessions/{get_session_id()}/actions/table.dropTable"),
         headers={
             "Authorization": f"Bearer {get_access_token()}",
             "Content-Type": "application/json",
@@ -135,15 +134,9 @@ def delete_cas_table(caslib: str, table: str):
     return result
 
 
-def upload_key_press(key_press_file: str = KEY_FILE):
-    with open(key_press_file, "r") as f:
-        reader = csv.DictReader(f)
-        first_row = next(reader)
-        user_id = first_row["id"]
-
-    table = f"{user_id}_taptracker"
-    caslib = "Public"
-
+def upload_key_press(
+    key_press_file: str = KEY_FILE, caslib: str = "Public", table: str = "taptracker"
+):
     if cas_table_exists(caslib, table):
         i = 0
         while cas_table_exists(caslib, f"{table}_i"):
@@ -154,3 +147,33 @@ def upload_key_press(key_press_file: str = KEY_FILE):
         delete_cas_table(caslib, temp_table)
     else:
         upload_data(caslib, table, key_press_file)
+
+
+def model_get_inputs(model_id: str = "gb_predict_parkinsons"):
+    url = f"{BASE_URL}/microanalyticScore/modules/{model_id}/steps"
+    headers = {
+        "Accept": "application/vnd.sas.collection+json",
+        "Authorization": f"Bearer {get_access_token()}",
+    }
+    response = requests.get(url, headers=headers, verify=False).json()
+
+    return [e["name"] for e in response["items"][-1]["inputs"]]
+
+
+def model_score_presses(
+    payload_dict: dict, model_id: str = "gb_predict_parkinsons"
+) -> requests.Response:
+    url = f"{BASE_URL}/microanalyticScore/modules/{model_id}/steps/score"
+    headers = {
+        "Authorization": "Bearer " + get_access_token(),
+        "Content-Type": "application/vnd.sas.microanalytic.module.step.input+json",
+    }
+
+    result = requests.post(
+        url, data=json.dumps(payload_dict), headers=headers, verify=False
+    ).json()
+
+    classification = result["outputs"][0]["value"]
+    probability = result["outputs"][1]["value"]
+
+    return classification, probability

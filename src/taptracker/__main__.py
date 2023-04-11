@@ -2,6 +2,7 @@ import argparse
 from typing import Optional
 
 import taptracker
+from taptracker.gui import gui
 
 
 def main(argv: Optional[str] = None):
@@ -22,13 +23,23 @@ def main(argv: Optional[str] = None):
         action="store_true",
         help="Run the SAS Viya model for taptracker and determine Parkinsons ",
     )
+    parser.add_argument(
+        "--gui",
+        action="store_true",
+        help=(
+            "Launch the visual interface"
+        ),
+    )
     args = parser.parse_args(argv)
 
+    if args.gui and any((args.track, args.report, args.upload)):
+        raise ValueError("Cannot open GUI and use CLI")
     if args.track and args.report:
         raise ValueError("Cannot specify both --track and --report")
 
-    if args.track:
-        print("Running taptracker, to exit press Ctrl + Alt + Shift + Esc")
+    if args.gui:
+        gui()
+    elif args.track:
         taptracker.track()
     elif args.upload:
         taptracker.upload()

@@ -13,14 +13,21 @@ UUID = str(uuid.UUID(int=uuid.getnode()))[-12:]
 if UUID[0].isnumeric():
     UUID = f"a{UUID[1:]}"
 
-# Package local files - Tokens
-REFRESH_TOKEN_FILE = importlib.resources.files("taptracker").joinpath("data/refresh_token.txt")
+# Package local files
+DATA = Path(importlib.resources.files("taptracker").joinpath("data"))
+
+# API tokens
+REFRESH_TOKEN_FILE = DATA / "refresh_token.txt"
 
 # Package directory file to save key info to
-KEY_FILE = importlib.resources.files("taptracker").joinpath("data/key_presses.csv")
+KEY_FILE = DATA / "key_presses.csv"
+
+# Theme and image files
+THEME_FILE = DATA / "ctk_theme.json"
+LOGO_FILE = DATA / "MARQUE-MAIN-LOGO.png"
 
 # Whether the process is currently running
-IS_RUNNING = Path(importlib.resources.files("taptracker").joinpath("data/.is_running"))
+IS_RUNNING = DATA / ".is_running"
 
 # Mapping of each key character to left or right side of keyboard
 KEY_HAND_MAP = {

@@ -51,7 +51,7 @@ def append_keystrokes(info: list[KeyInfo], key_file: Path = KEY_FILE):
         writer.writerows(info)
 
 
-def get_name(key: Key | KeyCode):
+def get_name(key: Key | KeyCode) -> str:
     """Get the simple name of a key like object"""
     try:
         if isinstance(key, KeyCode):
@@ -63,11 +63,6 @@ def get_name(key: Key | KeyCode):
     return name
 
 
-def on_hotkey():
-    """Exit Python on global hotkey"""
-    raise SystemExit()
-
-
 def check_running():
     if IS_RUNNING.exists():
         raise RuntimeError("The process is already running")
@@ -76,7 +71,14 @@ def check_running():
 
 
 def stop_running():
-    IS_RUNNING.unlink()
+    IS_RUNNING.unlink(missing_ok=True)
+
+
+def stop_tracking():
+    """Exit Python on global hotkey"""
+    Listener().stop()
+    stop_running()
+    print("Stopped tracking...")
 
 
 def handle_exception(
@@ -90,6 +92,7 @@ def handle_exception(
 
 
 def track():
+    print("Running taptracker, to exit press Ctrl + Alt + Shift + Esc")
     check_running()
     sys.excepthook = handle_exception
 
@@ -99,7 +102,7 @@ def track():
     current_keys: dict[str, KeyInfo] = {}
 
     # Global hotkey to exit taptracker
-    hotkey = HotKey(HotKey.parse("<ctrl>+<alt>+<shift>+<esc>"), on_hotkey)
+    hotkey = HotKey(HotKey.parse("<ctrl>+<alt>+<shift>+<esc>"), stop_tracking)
 
     def on_press(key: Key | KeyCode):
         """Inner function that records initial info when key is pressed
@@ -143,20 +146,33 @@ def track():
             append_keystrokes(key_presses)
             key_presses = []
 
-    with Listener(on_press=on_press, on_release=on_release) as listener:
-        listener.join()
-    stop_running()
+    listener = Listener(on_press=on_press, on_release=on_release)
+    listener.start()
 
 
 def upload():
     connections.refresh_access_token()
     connections.create_cas_session()
     connections.upload_key_press(KEY_FILE)
-    KEY_FILE.unlink()
+    # KEY_FILE.unlink()
 
 
 def report():
-    pass
+    from taptracker import processing
+
+    connections.refresh_access_token()
+
+    key_stats = processing.process(KEY_FILE)
+
+    classification, prob = connections.model_score_presses(
+        key_stats, "gb_predict_parkinsons"
+    )
+
+    return (
+        f"Based on your typing patterns and this model, it is likely {classification}"
+        " that you are showing symptoms of Parkinson's disease. This is based on"
+        f" the estimated likelihood of {prob:.2%}."
+    )
 
 
 if __name__ == "__main__":
