@@ -2,7 +2,7 @@ import importlib.resources
 import uuid
 from pathlib import Path
 
-# SAS hackathon site global vars
+# SAS hackathon site global vars - all deleted after hackathon finished
 CLIENT_ID = "taptracker"
 CLIENT_SECRET = "goobly"
 BASE_URL = "https://xaas-20791154275.engage.sas.com/"
