@@ -8,31 +8,15 @@ from taptracker.connections import model_get_inputs
 
 
 def process(key_file: str | Path) -> dict:
-    # Create all functions - think of better method that doesnt use exec?
-    for n in range(10, 100, 10):
-        exec(f"percnt{n} = lambda x: np.percentile(x, {n})")
-    def percnt90(series):
-        return np.percentile(series, 90)
-    def percnt80(series):
-        return np.percentile(series, 80)
-    def percnt70(series):
-        return np.percentile(series, 70)
-    def percnt60(series):
-        return np.percentile(series, 60)
-    def percnt50(series):
-        return np.percentile(series, 50)
-    def percnt40(series):
-        return np.percentile(series, 40)
-    def percnt30(series):
-        return np.percentile(series, 30)
-    def percnt20(series):
-        return np.percentile(series, 20)
-    def percnt10(series):
-        return np.percentile(series, 10)
-
     df = pd.read_csv(key_file).query("hand != 'U'")
 
     input_cols = model_get_inputs()
+
+    # Create percentile functions ot use for aggregates
+    def percentn(n):
+        return lambda x: np.percentile(x, n)
+
+    percent_funcs = [percentn(n) for n in range(10, 100, 10)]
 
     agg_df = keysprep(
         df,
@@ -42,15 +26,7 @@ def process(key_file: str | Path) -> dict:
             np.std,
             stats.kurtosis,
             stats.skew,
-            percnt10,
-            percnt20,
-            percnt30,
-            percnt40,
-            percnt50,
-            percnt60,
-            percnt70,
-            percnt80,
-            percnt90,
+            *percent_funcs
         ],
         input_cols,
     )
